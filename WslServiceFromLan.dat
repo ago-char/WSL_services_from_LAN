@@ -1,6 +1,6 @@
 # You have to understand that WSL instance is not in your local area network meaning it is not getting ip address directly from router in your home. It is a virtual machine. You can imagine some sort of machine connected from your PC using ethernet.
 
-# WSL uses virtual ethernet adapter you can verify it in the <vEthernetWSL.jpg>where as your windows machine use different wifi adapter as on <WifiAdapter.jpg>, this is where you can know that they are not in same LAN
+# WSL uses virtual ethernet adapter you can verify it in the <https://github.com/ago-char/WSL_services_from_LAN/blob/master/vEthernetWSL.jpg>where as your windows machine use different wifi adapter as on <https://github.com/ago-char/WSL_services_from_LAN/blob/master/WifiAdapter.jpg>, this is where you can know that they are not in same LAN
 
 # The problem hereby is that we want to access some sort of service running on WSL instance from any computer in our LAN. As WSL works on virtual ethernet adapter, there is no way you gonna plug in cable from any computers in your LAN, as its only interface is already virtually connected to host machine. So how we gonna solve it ? Well, use of portproxy.
 
@@ -10,10 +10,10 @@
 # To add portproxy
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=2222 connectaddress=localhost connectport=22
 
-# make sure it is added <portProx.jpg>
+# make sure it is added <https://github.com/ago-char/WSL_services_from_LAN/blob/master/portProxy.jpg>
 netsh interface portproxy show all
 
-# make sure 2222 port is listening on host, see <hostPortListening.jpg>
+# make sure 2222 port is listening on host, see <https://github.com/ago-char/WSL_services_from_LAN/blob/master/hostPortListening.jpg>
 netstat -ano | findstr :2222
 
 # Don't worry, I will break down but not going into details. It is actually establishing a proxy a kind of bridge which use IPv4 meaning that both end is using IPv4 protocol. Host will listen on 0.0.0.0 which is wildcard for all ip address. This may be drawback, if you are aware that certain PC with specific IP address will only be connecting, then it is worth replacing with that specific PC's ip address. As there is no facility to specify whole network, I supply 0.0.0.0 . Make sure your firewall is strong enough. Host is waiting for connection in port 2222 which will then forward to 'localhost'. Why localhost and why not IP Address of WSL instance? Because IP Address of WSL instance is not static, it's dynamic. Finally, WSL will be waiting for connection in port 22.
@@ -21,7 +21,7 @@ netstat -ano | findstr :2222
 # I started ssh service on WSL, of course you can use anothre service
 systemctl start sshd
 
-# Verify it , you should see 'running', see <sshServiceStatus.jpg>
+# Verify it , you should see 'running', see <https://github.com/ago-char/WSL_services_from_LAN/blob/master/sshServiceStatus.jpg>
 systemctl status sshd
 
 # Now trying to access service from my machine in LAN, we should now be connected to WSL server running ssh, as 192.168.1.94 will forward connection it receives on 2222 to 22 of WSL where username is doctor.
@@ -35,15 +35,15 @@ netsh advfirewall firewall add rule name="wsl ssh" dir=in action=allow protocol=
 netsh advfirewall firewall show rule name=all > rules.txt
 notepad rules.txt
 
-# search for string "wsl ssh", you will see many details like <verifyFirewallNotepad.jpg>
+# search for string "wsl ssh", you will see many details like <https://github.com/ago-char/WSL_services_from_LAN/blob/master/verifyFirewallNotepad.jpg>
 # just for in case you do not want to use any GUI:
 netsh advfirewall firewall show rule name=all | find "wsl ssh"
-# if you get someting like <verifyFirewallCmd.jpg> you are good to go
+# if you get someting like <https://github.com/ago-char/WSL_services_from_LAN/blob/master/verifyFirewallCmd.jpg> you are good to go
 
 # do not hesitate to connect to server from another PC again:
 ssh -v -p 2222 doctor@192.168.1.94
 
-# Well done, it's done and dusted: see <doneAndDusted.jpg>
+# Well done, it's done and dusted: see <https://github.com/ago-char/WSL_services_from_LAN/blob/master/doneAndDusted.jpg>
 
 
 
@@ -56,7 +56,7 @@ netsh advfirewall firewall delete rule name="wsl ssh"
 # you may wanna host stop listening to port 2222
 taskkill /pid  <pid> /f   
 # you can get pid at last column from the output of 
-netstat -ano | findstr :2222   # see <hostPortListening.jpg>
+netstat -ano | findstr :2222   # see <https://github.com/ago-char/WSL_services_from_LAN/blob/master/hostPortListening.jpg>
 
 # and stop ssh service
 systemctl stop sshd
